@@ -1,72 +1,173 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 
-namespace builder_design_pattern
+
+public interface IVehicleBuilder
 {
- 
-//product interface
- public interface IFactory
+ void SetModel();
+ void SetEngine();
+ void SetTransmission();
+ void SetBody();
+ void SetAccessories();
+
+ Vehicle GetVehicle();
+}
+
+
+// The 'ConcreteBuilder1' class
+
+public class HeroBuilder : IVehicleBuilder
+{
+ Vehicle objVehicle = new Vehicle();
+ public void SetModel()
  {
- void Drive(int miles);
+ objVehicle.Model = "Hero";
  }
 
-
- public class Scooter : IFactory
+ public void SetEngine()
  {
- public void Drive(int miles)
- {
- Console.WriteLine("Drive the Scooter : " + miles.ToString() + "km");
- }
+ objVehicle.Engine = "4 Stroke";
  }
 
- 
- public class Bike : IFactory
+ public void SetTransmission()
  {
- public void Drive(int miles)
- {
- Console.WriteLine("Drive the Bike : " + miles.ToString() + "km");
- }
+ objVehicle.Transmission = "120 km/hr";
  }
 
-
-
- public abstract class VehicleFactory
+ public void SetBody()
  {
- public abstract IFactory GetVehicle(string Vehicle);
-
+ objVehicle.Body = "Plastic";
  }
 
+ public void SetAccessories()
+ {
+ objVehicle.Accessories.Add("Seat Cover");
+ objVehicle.Accessories.Add("Rear Mirror");
+ }
 
- public class ConcreteVehicleFactory : VehicleFactory
+ public Vehicle GetVehicle()
  {
- public override IFactory GetVehicle(string Vehicle)
+ return objVehicle;
+ }
+}
+
+
+
+
+public class HondaBuilder : IVehicleBuilder
+{
+ Vehicle objVehicle = new Vehicle();
+ public void SetModel()
  {
- switch (Vehicle)
+ objVehicle.Model = "Honda";
+ }
+
+ public void SetEngine()
  {
- case "Scooter":
- return new Scooter();
- case "Bike":
- return new Bike();
- default:
- throw new ApplicationException(string.Format("Vehicle '{0}' cannot be created", Vehicle));
+ objVehicle.Engine = "4 Stroke";
+ }
+
+ public void SetTransmission()
+ {
+ objVehicle.Transmission = "125 Km/hr";
+ }
+
+ public void SetBody()
+ {
+ objVehicle.Body = "Plastic";
+ }
+
+ public void SetAccessories()
+ {
+ objVehicle.Accessories.Add("Seat Cover");
+ objVehicle.Accessories.Add("Rear Mirror");
+ objVehicle.Accessories.Add("Helmet");
+ }
+
+ public Vehicle GetVehicle()
+ {
+ return objVehicle;
+ }
+}
+
+
+// The 'Product' class
+
+public class Vehicle
+{
+ public string Model { get; set; }
+ public string Engine { get; set; }
+ public string Transmission { get; set; }
+ public string Body { get; set; }
+ public List<string> Accessories { get; set; }
+
+ public Vehicle()
+ {
+ Accessories = new List<string>();
+ }
+
+ public void ShowInfo()
+ {
+ Console.WriteLine("Model: {0}", Model);
+ Console.WriteLine("Engine: {0}", Engine);
+ Console.WriteLine("Body: {0}", Body);
+ Console.WriteLine("Transmission: {0}", Transmission);
+ Console.WriteLine("Accessories:");
+ foreach (var accessory in Accessories)
+ {
+ Console.WriteLine("\t{0}", accessory);
  }
  }
 }
- 
 
- class Program
+
+/// The 'Director' class
+
+public class VehicleCreator
+{
+ private readonly IVehicleBuilder objBuilder;
+
+ public VehicleCreator(IVehicleBuilder builder)
  {
+ objBuilder = builder;
+ }
+
+ public void CreateVehicle()
+ {
+ objBuilder.SetModel();
+ objBuilder.SetEngine();
+ objBuilder.SetBody();
+ objBuilder.SetTransmission();
+ objBuilder.SetAccessories();
+ }
+
+ public Vehicle GetVehicle()
+ {
+ return objBuilder.GetVehicle();
+ }
+}
+
+
+// Builder Design Pattern Demo
+
+class Program
+{
  static void Main(string[] args)
  {
- VehicleFactory factory = new ConcreteVehicleFactory();
+ var vehicleCreator = new VehicleCreator(new HeroBuilder());
+ vehicleCreator.CreateVehicle();
+ var vehicle = vehicleCreator.GetVehicle();
+ vehicle.ShowInfo();
 
- IFactory scooter = factory.GetVehicle("Scooter");
- scooter.Drive(10);
+ Console.WriteLine("---------------------------------------------");
 
- IFactory bike = factory.GetVehicle("Bike");
- bike.Drive(20);
+ vehicleCreator = new VehicleCreator(new HondaBuilder());
+ vehicleCreator.CreateVehicle();
+ vehicle = vehicleCreator.GetVehicle();
+ vehicle.ShowInfo();
 
  Console.ReadKey();
-
- }
  }
 }
+
+ 
